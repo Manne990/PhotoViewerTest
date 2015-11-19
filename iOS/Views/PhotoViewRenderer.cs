@@ -21,6 +21,18 @@ namespace PhotoViewerTest.iOS
 
         // ---------------------------------------------------------
 
+        #region Enums
+
+        public enum AutoScaleModes
+        {
+            AutoWidth,
+            AutoHeight
+        }
+
+        #endregion
+
+        // ---------------------------------------------------------
+
         #region Overrides
 
         protected override void OnElementChanged(ElementChangedEventArgs<PhotoView> e)
@@ -29,41 +41,12 @@ namespace PhotoViewerTest.iOS
 
             if (e.OldElement != null)
             {
-                _scrollView.Dispose();
-
-                _childRenderer.NativeView.RemoveFromSuperview();
-                _childRenderer.NativeView.Dispose();
-                _childRenderer.Dispose();
+                CleanUpRenderer();
             }
 
             if (e.NewElement != null)
             {
-                _scrollView = new UIScrollView
-                {
-                    PagingEnabled = false,
-                    ShowsHorizontalScrollIndicator = false,
-                    ShowsVerticalScrollIndicator = false,
-                    ScrollsToTop = false
-                };
-                
-                _childRenderer = Platform.CreateRenderer(e.NewElement.ImageView);
-                _scrollView.AddSubview(_childRenderer.NativeView);
-
-                _scrollView.DidZoom += (object sender, EventArgs ee) => 
-                    {
-                        CenterImageInScrollView();
-                    };
-
-                var doubletap = new UITapGestureRecognizer(OnDoubleTap)
-                {
-                    NumberOfTapsRequired = 2
-                };
-
-                var imageView = (ViewRenderer<Image,UIImageView>)_childRenderer.NativeView;
-
-                this.SetNativeControl(_scrollView);
-
-                this.Control.AddGestureRecognizer(doubletap);
+                InitializeRenderer(e.NewElement);
             }
         }
 
@@ -73,6 +56,7 @@ namespace PhotoViewerTest.iOS
 
             if (e.PropertyName == "IsActive")
             {
+                // Reset zoom scale when image gets active (visible)
                 _scrollView.SetZoomScale(_scrollView.MinimumZoomScale, false);
             }
         }
@@ -81,54 +65,19 @@ namespace PhotoViewerTest.iOS
         {
             base.LayoutSubviews();
 
+            // Update the scroll view
             _scrollView.ContentSize = new CGSize(_scrollView.Frame.Width, _scrollView.Frame.Height);
 
-            _scrollView.ViewForZoomingInScrollView += (UIScrollView sv) =>
-                {
-                    return _childRenderer.NativeView;
-                };
+            UpdateMinimumMaximumZoom();
 
-            var imageView = (ViewRenderer<Image,UIImageView>)_childRenderer.NativeView;
-            var imageWidth = imageView.Control.Image.Size.Width;
-            var imageHeight = imageView.Control.Image.Size.Height;
-            var imageAspect = imageWidth / imageHeight;
-            var screenAspect = this.Bounds.Width / this.Bounds.Height;
-
-            if (imageWidth > imageHeight)
-            {
-                // Wide Image
-                if (this.Bounds.Width > this.Bounds.Height)
-                {
-                    // Landscape
-                    _scrollView.MinimumZoomScale = this.Bounds.Width / (imageWidth * (screenAspect / imageAspect));
-                }
-                else
-                {
-                    // Portrait
-                    _scrollView.MinimumZoomScale = this.Bounds.Width / imageWidth;
-                }
-            }
-            else
-            {
-                // Tall Image
-                if (this.Bounds.Width > this.Bounds.Height)
-                {
-                    // Landscape
-                    _scrollView.MinimumZoomScale = this.Bounds.Height / imageHeight;
-                }
-                else
-                {
-                    // Portrait
-                    _scrollView.MinimumZoomScale = this.Bounds.Height / (imageHeight * (imageAspect / screenAspect));
-                }
-            }
-
-            _scrollView.MinimumZoomScale = _scrollView.MinimumZoomScale * 0.99f;
-            _scrollView.MaximumZoomScale = _scrollView.MinimumZoomScale * 6;
             _scrollView.SetZoomScale(_scrollView.MinimumZoomScale, false);
 
-            _childRenderer.Element.Layout(new Rectangle(0, 0, imageWidth, imageHeight));
+            // Render the control
+            var imageView = (ViewRenderer<Image,UIImageView>)_childRenderer.NativeView;
 
+            _childRenderer.Element.Layout(new Rectangle(0, 0, imageView.Control.Image.Size.Width, imageView.Control.Image.Size.Height));
+
+            // Center the image view
             CenterImageInScrollView();
         }
 
@@ -156,31 +105,95 @@ namespace PhotoViewerTest.iOS
 
         // ---------------------------------------------------------
 
+        #region Public Properties
+
+        public AutoScaleModes AutoScaleMode { get; set; }
+
+        #endregion
+
+        // ---------------------------------------------------------
+
         #region Private Methods
+
+        private void InitializeRenderer(PhotoView view)
+        {
+            // Init
+            this.AutoScaleMode = AutoScaleModes.AutoHeight;
+
+            // Create the scroll view
+            _scrollView = new UIScrollView
+                {
+                    PagingEnabled = false,
+                    ShowsHorizontalScrollIndicator = false,
+                    ShowsVerticalScrollIndicator = false,
+                    ScrollsToTop = false
+                };
+
+            // Add the child renderer to the scroll view
+            _childRenderer = Platform.CreateRenderer(view.ImageView);
+            _scrollView.AddSubview(_childRenderer.NativeView);
+
+            // Handle events
+            _scrollView.DidZoom += (object sender, EventArgs ee) => { CenterImageInScrollView(); };
+            _scrollView.ViewForZoomingInScrollView += (UIScrollView sv) => { return _childRenderer.NativeView; };
+
+            // Set the scroll view as the native control
+            this.SetNativeControl(_scrollView);
+
+            // Add gesture recognizers
+            this.Control.AddGestureRecognizer(new UITapGestureRecognizer(OnDoubleTap) { NumberOfTapsRequired = 2 });
+        }
+
+        private void CleanUpRenderer()
+        {
+            _scrollView.Dispose();
+
+            _childRenderer.NativeView.RemoveFromSuperview();
+            _childRenderer.NativeView.Dispose();
+            _childRenderer.Dispose();
+        }
+
+        private void UpdateMinimumMaximumZoom()
+        {
+            var imageView = (ViewRenderer<Image,UIImageView>)_childRenderer.NativeView;
+            nfloat zoomScale = GetZoomScaleThatFits(this.Bounds.Size, imageView.Bounds.Size);
+
+            _scrollView.MinimumZoomScale = zoomScale * 0.99f;   
+            _scrollView.MaximumZoomScale = _scrollView.MinimumZoomScale * 6;
+        }
+
+        private nfloat GetZoomScaleThatFits(CGSize target, CGSize source)
+        {
+            nfloat wScale = target.Width / source.Width;
+            nfloat hScale = target.Height / source.Height;
+
+            return AutoScaleMode == AutoScaleModes.AutoWidth ? (wScale < hScale ? hScale : wScale) : (wScale < hScale ? wScale : hScale);
+        }
 
         private void CenterImageInScrollView()
         {
-            nfloat top = 0;
+            // Calculate the left/right paddings
             nfloat left = 0;
-
             if (_scrollView.ContentSize.Width < _scrollView.Bounds.Size.Width)
             {
                 left = (_scrollView.Bounds.Size.Width - _scrollView.ContentSize.Width) * 0.5f;
             }
 
+            // Calculate the top/bottom paddings
+            nfloat top = 0;
             if (_scrollView.ContentSize.Height < _scrollView.Bounds.Size.Height)
             {
                 top = (_scrollView.Bounds.Size.Height - _scrollView.ContentSize.Height) * 0.5f;
             }
 
+            // Apply the paddings/insets
             _scrollView.ContentInset = new UIEdgeInsets(top, left, top, left);
         }
 
         private void ZoomToPoint(CGPoint zoomPoint, nfloat scale, bool animated)
         {
             // Normalize current content size back to content scale of 1.0f
-            var contentSize = new CGSize(_scrollView.ContentSize.Width / _scrollView.ZoomScale, 
-                                  _scrollView.ContentSize.Height / _scrollView.ZoomScale);
+            var contentSize = new CGSize(_scrollView.ContentSize.Width / _scrollView.ZoomScale, _scrollView.ContentSize.Height / _scrollView.ZoomScale);
 
             // Translate the zoom point to relative to the content rect
             zoomPoint.X = (zoomPoint.X / this.Bounds.Size.Width) * contentSize.Width;

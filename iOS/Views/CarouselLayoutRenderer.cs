@@ -6,6 +6,7 @@ using PhotoViewerTest.iOS;
 using UIKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
+using System.Threading.Tasks;
 
 [assembly:ExportRenderer(typeof(CarouselLayout), typeof(CarouselLayoutRenderer))]
 
@@ -14,6 +15,7 @@ namespace PhotoViewerTest.iOS
     public class CarouselLayoutRenderer : ScrollViewRenderer
     {
         UIScrollView _native;
+        nfloat _lastContentOffsetX;
 
         public CarouselLayoutRenderer ()
         {
@@ -37,12 +39,20 @@ namespace PhotoViewerTest.iOS
             base.Draw (rect);
             ScrollToSelection (false);
         }
-
-        private void NativeScrolled (object sender, EventArgs e)
+            
+        private void NativeScrolled(object sender, EventArgs e)
         {
+            if (_native.ContentOffset.X == 0 && _lastContentOffsetX > 100)
+            {
+                ScrollToSelection(false);
+                return;
+            }
+
             var center = _native.ContentOffset.X + (_native.Bounds.Width / 2);
 
             ((CarouselLayout)Element).SelectedIndex = ((int)center) / ((int)_native.Bounds.Width);
+
+            _lastContentOffsetX = _native.ContentOffset.X;
         }
 
         private void ElementPropertyChanged(object sender, PropertyChangedEventArgs e) 
@@ -53,7 +63,7 @@ namespace PhotoViewerTest.iOS
             }
         }
 
-        private void ScrollToSelection (bool animate)
+        private void ScrollToSelection(bool animate)
         {
             if (Element == null) return;
 
