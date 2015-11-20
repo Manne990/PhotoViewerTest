@@ -129,6 +129,9 @@ namespace PhotoViewerTest.iOS
                     ScrollsToTop = false
                 };
 
+            // Load the image
+            view.ImageView.Source = view.ImageName;
+
             // Add the child renderer to the scroll view
             _childRenderer = Platform.CreateRenderer(view.ImageView);
             _scrollView.AddSubview(_childRenderer.NativeView);

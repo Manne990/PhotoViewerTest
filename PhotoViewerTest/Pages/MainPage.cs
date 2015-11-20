@@ -19,7 +19,7 @@ namespace PhotoViewerTest
         private View CreateSinglePhotoViewer()
         {
             // Create a signle PhotoView
-            var photoView = new PhotoView() { BackgroundColor = Color.Gray, PhotoSource = "bild1.jpg" };
+            var photoView = new PhotoView() { BackgroundColor = Color.Gray, ImageName = "bild1.jpg" };
 
             // Add the PhotoView to a layout
             var layout = new RelativeLayout();
@@ -81,7 +81,7 @@ namespace PhotoViewerTest
         {
             _photoView = new PhotoView() { BackgroundColor = Color.Gray };
 
-            _photoView.ImageView.SetBinding(Image.SourceProperty, "ImageSource");
+            _photoView.SetBinding(PhotoView.ImageNameProperty, "ImageName");
 
             Content = _photoView;
         }
@@ -118,10 +118,7 @@ namespace PhotoViewerTest
             PropertyChanged (this, new PropertyChangedEventArgs (propertyName));
         }
 
-        protected void SetObservableProperty<T>(
-            ref T field, 
-            T value,
-            [CallerMemberName] string propertyName = "")
+        protected void SetObservableProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
         {
             if (EqualityComparer<T>.Default.Equals(field, value)) return;
             field = value;
@@ -135,7 +132,7 @@ namespace PhotoViewerTest
 
     public class ImageViewModel : BaseViewModel
     {
-        public ImageSource ImageSource { get; set; }
+        public string ImageName { get; set; }
     }
         
     public class ImagesViewModel : BaseViewModel
@@ -143,9 +140,9 @@ namespace PhotoViewerTest
         public ImagesViewModel()
         {
             this.Images = new List<ImageViewModel>() { 
-                new ImageViewModel() { ImageSource = "bild1.jpg"},
-                new ImageViewModel() { ImageSource = "bild2.jpg"},
-                new ImageViewModel() { ImageSource = "bild3.jpg"}
+                new ImageViewModel() { ImageName = "bild1.jpg"},
+                new ImageViewModel() { ImageName = "bild2.jpg"},
+                new ImageViewModel() { ImageName = "bild3.jpg"}
             };
         }
 

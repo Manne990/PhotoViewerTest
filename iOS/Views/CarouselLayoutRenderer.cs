@@ -1,12 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Threading.Tasks;
 using PhotoViewerTest;
 using PhotoViewerTest.iOS;
 using UIKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
-using System.Threading.Tasks;
 
 [assembly:ExportRenderer(typeof(CarouselLayout), typeof(CarouselLayoutRenderer))]
 
