@@ -19,6 +19,7 @@ namespace PhotoViewerTest.Droid
         private static readonly int MAX_IMAGE_SIZE_WIDTH = 256;
         private static readonly int MAX_IMAGE_SIZE_HEIGHT = 256;
 
+        private PhotoView _view;
         private PhotoViewDroid _photoView;
 
         #endregion
@@ -38,17 +39,33 @@ namespace PhotoViewerTest.Droid
 
             if (e.NewElement != null)
             {
-                await InitializeRenderer(e.NewElement);
+                _view = e.NewElement;
+
+                if (string.IsNullOrWhiteSpace(_view.ImageName) == false)
+                {
+                    var fileSystem = new FileSystem();
+                    var filePath = fileSystem.GetFilePath(_view.ImageName);
+
+                    await InitializeRenderer(_view, filePath);
+                }
             }
         }
 
-        protected override void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        protected async override void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             base.OnElementPropertyChanged(sender, e);
 
             if (e.PropertyName == "IsActive")
             {
                 //TODO: Reset zoom scale when image gets active (visible)
+            }
+
+            if (e.PropertyName == "ImageName" && string.IsNullOrWhiteSpace(_view.ImageName) == false)
+            {
+                var fileSystem = new FileSystem();
+                var filePath = fileSystem.GetFilePath(_view.ImageName);
+
+                await InitializeRenderer(_view, filePath);
             }
         }
 
@@ -58,17 +75,14 @@ namespace PhotoViewerTest.Droid
 
         #region Private Methods
 
-        private async Task InitializeRenderer(PhotoView view)
+        private async Task InitializeRenderer(PhotoView view, string filePath)
         {
             // Create the Photo View
             _photoView = new PhotoViewDroid(this.Context);
 
             // Prepare the image
-            var imageResourceName = view.ImageName.Remove(view.ImageName.IndexOf(".")); // Not a good implementation...
-            var imageId = this.Resources.GetIdentifier(imageResourceName, "drawable", this.Context.ApplicationInfo.PackageName);
-
-            var options = await GetBitmapOptionsOfImageAsync(Resource.Drawable.bild1);
-            var bitmapToDisplay = await LoadScaledDownBitmapForDisplayAsync(Resources, imageId, options, MAX_IMAGE_SIZE_WIDTH, MAX_IMAGE_SIZE_HEIGHT);
+            var options = await GetBitmapOptionsOfImageAsync(filePath);
+            var bitmapToDisplay = await LoadScaledDownBitmapForDisplayAsync(Resources, filePath, options, MAX_IMAGE_SIZE_WIDTH, MAX_IMAGE_SIZE_HEIGHT);
 
             // Set the scroll view as the native control
             this.SetNativeControl(_photoView);
@@ -82,16 +96,14 @@ namespace PhotoViewerTest.Droid
             _photoView.Dispose();
         }
 
-        private async Task<BitmapFactory.Options> GetBitmapOptionsOfImageAsync(int id)
+        private async Task<BitmapFactory.Options> GetBitmapOptionsOfImageAsync(string filePath)
         {
             var options = new BitmapFactory.Options {
                 InJustDecodeBounds = true
             };
 
             // The result will be null because InJustDecodeBounds == true.
-            await BitmapFactory.DecodeResourceAsync(Resources, id, options);
-
-            //await BitmapFactory.DecodeFileAsync("Path to file", options);
+            await BitmapFactory.DecodeFileAsync(filePath, options);
 
             int imageHeight = options.OutHeight;
             int imageWidth = options.OutWidth;
@@ -121,7 +133,7 @@ namespace PhotoViewerTest.Droid
             return (int)inSampleSize;
         }
 
-        private async Task<Bitmap> LoadScaledDownBitmapForDisplayAsync(Resources res, int id, BitmapFactory.Options options, int reqWidth, int reqHeight)
+        private async Task<Bitmap> LoadScaledDownBitmapForDisplayAsync(Resources res, string filePath, BitmapFactory.Options options, int reqWidth, int reqHeight)
         {
             // Calculate inSampleSize
             options.InSampleSize = CalculateInSampleSize(options, reqWidth, reqHeight);
@@ -129,8 +141,7 @@ namespace PhotoViewerTest.Droid
             // Decode bitmap with inSampleSize set
             options.InJustDecodeBounds = false;
 
-            return await BitmapFactory.DecodeResourceAsync(res, id, options);
-            //return await BitmapFactory.DecodeFileAsync("Path to file", options);
+            return await BitmapFactory.DecodeFileAsync(filePath, options);
         }
 
         #endregion

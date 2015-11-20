@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Xamarin.Forms;
 
@@ -39,8 +40,10 @@ namespace PhotoViewerTest
 
         public IndicatorStyleEnum IndicatorStyle { get; set; }
 
-        public IList<View> Children {
-            get {
+        public IList<View> Children 
+        {
+            get 
+            {
                 return _stack.Children;
             }
         }
@@ -49,10 +52,16 @@ namespace PhotoViewerTest
         protected override void LayoutChildren (double x, double y, double width, double height)
         {
             base.LayoutChildren (x, y, width, height);
+
             if (_layingOutChildren) return;
 
             _layingOutChildren = true;
-            foreach (var child in Children) child.WidthRequest = width;
+
+            foreach (var child in Children)
+            {
+                child.WidthRequest = width;
+            }
+
             _layingOutChildren = false;
         }
 
@@ -102,36 +111,47 @@ namespace PhotoViewerTest
                 view => view.ItemsSource,
                 null,
                 propertyChanging: (bindableObject, oldValue, newValue) => {
-                ((CarouselLayout)bindableObject).ItemsSourceChanging ();
-            },
+                    ((CarouselLayout)bindableObject).ItemsSourceChanging ();
+                },
                 propertyChanged: (bindableObject, oldValue, newValue) => {
-                ((CarouselLayout)bindableObject).ItemsSourceChanged ();
-            }
+                    ((CarouselLayout)bindableObject).ItemsSourceChanged ();
+                }
             );
 
         public IList ItemsSource {
             get {
-                return (IList)GetValue (ItemsSourceProperty);
+                return (IList)GetValue(ItemsSourceProperty);
             }
             set {
-                SetValue (ItemsSourceProperty, value);
+                SetValue(ItemsSourceProperty, value);
             }
+        }
+
+        public void Refresh()
+        {
+            ItemsSourceChanging();
+            ItemsSourceChanged();
         }
 
         void ItemsSourceChanging ()
         {
             if (ItemsSource == null) return;
-            _selectedIndex = ItemsSource.IndexOf (SelectedItem);
+            _selectedIndex = ItemsSource.IndexOf(SelectedItem);
         }
 
         void ItemsSourceChanged ()
         {
             _stack.Children.Clear ();
-            foreach (var item in ItemsSource) {
+            foreach (var item in ItemsSource) 
+            {
                 var view = (View)ItemTemplate.CreateContent ();
                 var bindableObject = view as BindableObject;
+
                 if (bindableObject != null)
+                {
                     bindableObject.BindingContext = item;
+                }
+                    
                 _stack.Children.Add (view);
             }
 

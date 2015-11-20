@@ -106,6 +106,8 @@
     <Compile Include="Common\PhotoViewDroid\Scrollerproxy\IcsScroller.cs" />
     <Compile Include="Common\PhotoViewDroid\Scrollerproxy\PreGingerScroller.cs" />
     <Compile Include="Common\PhotoViewDroid\Scrollerproxy\ScrollerProxy.cs" />
+    <Compile Include="Services\FileSystem.cs" />
+    <Compile Include="Views\RoundedBoxRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -118,6 +120,7 @@
     <Folder Include="Resources\values\" />
     <Folder Include="Views\" />
     <Folder Include="Common\" />
+    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\icon.png" />

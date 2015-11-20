@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Threading.Tasks;
+using CoreGraphics;
 using PhotoViewerTest;
 using PhotoViewerTest.iOS;
 using UIKit;
@@ -37,7 +38,8 @@ namespace PhotoViewerTest.iOS
         public override void Draw(CoreGraphics.CGRect rect)
         {
             base.Draw (rect);
-            ScrollToSelection (false);
+
+            ScrollToSelection(false);
         }
             
         private void NativeScrolled(object sender, EventArgs e)

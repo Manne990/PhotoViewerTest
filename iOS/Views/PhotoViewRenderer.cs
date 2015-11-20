@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using CoreGraphics;
 using PhotoViewerTest;
 using PhotoViewerTest.iOS;
@@ -15,7 +16,8 @@ namespace PhotoViewerTest.iOS
         #region Private Members
 
         private UIScrollView _scrollView;
-        private IVisualElementRenderer _childRenderer;
+        private UIImageView _imageView;
+        private PhotoView _view;
 
         #endregion
 
@@ -46,7 +48,14 @@ namespace PhotoViewerTest.iOS
 
             if (e.NewElement != null)
             {
-                InitializeRenderer(e.NewElement);
+                _view = e.NewElement;
+
+                InitializeRenderer(_view);
+
+                if (string.IsNullOrWhiteSpace(e.NewElement.ImageName) == false)
+                {
+                    LoadImage();
+                }
             }
         }
 
@@ -59,23 +68,31 @@ namespace PhotoViewerTest.iOS
                 // Reset zoom scale when image gets active (visible)
                 _scrollView.SetZoomScale(_scrollView.MinimumZoomScale, false);
             }
+
+            if (e.PropertyName == "ImageName" && string.IsNullOrWhiteSpace(_view.ImageName) == false)
+            {
+                LoadImage();
+
+                this.LayoutSubviews();
+            }
         }
 
         public override void LayoutSubviews()
         {
             base.LayoutSubviews();
 
+            if (_scrollView == null || _imageView == null || string.IsNullOrWhiteSpace(_view.ImageName))
+            {
+                return;
+            }
+
             // Update the scroll view
             _scrollView.ContentSize = new CGSize(_scrollView.Frame.Width, _scrollView.Frame.Height);
+            _imageView.Frame = new CGRect(0, 0, _imageView.Image.Size.Width, _imageView.Image.Size.Height);
 
             UpdateMinimumMaximumZoom();
 
             _scrollView.SetZoomScale(_scrollView.MinimumZoomScale, false);
-
-            // Render the control
-            var imageView = (ViewRenderer<Image,UIImageView>)_childRenderer.NativeView;
-
-            _childRenderer.Element.Layout(new Rectangle(0, 0, imageView.Control.Image.Size.Width, imageView.Control.Image.Size.Height));
 
             // Center the image view
             CenterImageInScrollView();
@@ -129,16 +146,14 @@ namespace PhotoViewerTest.iOS
                     ScrollsToTop = false
                 };
 
-            // Load the image
-            view.ImageView.Source = view.ImageName;
+            // Create the image view
+            _imageView = new UIImageView();
 
-            // Add the child renderer to the scroll view
-            _childRenderer = Platform.CreateRenderer(view.ImageView);
-            _scrollView.AddSubview(_childRenderer.NativeView);
+            _scrollView.AddSubview(_imageView);
 
             // Handle events
             _scrollView.DidZoom += (object sender, EventArgs ee) => { CenterImageInScrollView(); };
-            _scrollView.ViewForZoomingInScrollView += (UIScrollView sv) => { return _childRenderer.NativeView; };
+            _scrollView.ViewForZoomingInScrollView += (UIScrollView sv) => { return _imageView; };
 
             // Set the scroll view as the native control
             this.SetNativeControl(_scrollView);
@@ -149,17 +164,21 @@ namespace PhotoViewerTest.iOS
 
         private void CleanUpRenderer()
         {
+            _imageView.Dispose();
             _scrollView.Dispose();
+        }
 
-            _childRenderer.NativeView.RemoveFromSuperview();
-            _childRenderer.NativeView.Dispose();
-            _childRenderer.Dispose();
+        private void LoadImage()
+        {
+            var fileSystem = new FileSystem();
+            var imageBytes = fileSystem.LoadBinary(_view.ImageName);
+
+            _imageView.Image = imageBytes.ToUIImage();
         }
 
         private void UpdateMinimumMaximumZoom()
         {
-            var imageView = (ViewRenderer<Image,UIImageView>)_childRenderer.NativeView;
-            nfloat zoomScale = GetZoomScaleThatFits(this.Bounds.Size, imageView.Bounds.Size);
+            nfloat zoomScale = GetZoomScaleThatFits(this.Bounds.Size, _imageView.Bounds.Size);
 
             _scrollView.MinimumZoomScale = zoomScale * 0.99f;   
             _scrollView.MaximumZoomScale = _scrollView.MinimumZoomScale * 6;

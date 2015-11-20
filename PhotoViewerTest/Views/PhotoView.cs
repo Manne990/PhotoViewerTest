@@ -9,9 +9,7 @@ namespace PhotoViewerTest
 
         public PhotoView()
         {
-            ImageView = new Image();
 
-            this.Content = ImageView;
         }
 
         #endregion
@@ -19,8 +17,6 @@ namespace PhotoViewerTest
         // ---------------------------------------------------------
 
         #region Public Properties
-
-        public Image ImageView { get; private set; }
 
         public static readonly BindableProperty ImageNameProperty = BindableProperty.Create("ImageName", typeof(string), typeof(PhotoView), string.Empty);
         public string ImageName
