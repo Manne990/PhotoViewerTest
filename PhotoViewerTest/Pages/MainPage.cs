@@ -80,6 +80,10 @@ namespace PhotoViewerTest
             await LoadSingleImage("bild1.jpg", "https://raw.githubusercontent.com/Manne990/PhotoViewerTest/master/iOS/Resources/bild1.jpg");
             await LoadSingleImage("bild2.jpg", "https://raw.githubusercontent.com/Manne990/PhotoViewerTest/master/iOS/Resources/bild2.jpg");
             await LoadSingleImage("bild3.jpg", "https://raw.githubusercontent.com/Manne990/PhotoViewerTest/master/iOS/Resources/bild3.jpg");
+            await LoadSingleImage("bild4.jpg", "https://raw.githubusercontent.com/Manne990/PhotoViewerTest/master/iOS/Resources/bild4.jpg");
+            await LoadSingleImage("bild5.jpg", "https://raw.githubusercontent.com/Manne990/PhotoViewerTest/master/iOS/Resources/bild5.jpg");
+            await LoadSingleImage("bild6.jpg", "https://raw.githubusercontent.com/Manne990/PhotoViewerTest/master/iOS/Resources/bild6.jpg");
+            await LoadSingleImage("bild7.jpg", "https://raw.githubusercontent.com/Manne990/PhotoViewerTest/master/iOS/Resources/bild7.jpg");
         }
 
         private void ShowImage(string imageName)

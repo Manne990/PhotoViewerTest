@@ -16,8 +16,8 @@ namespace PhotoViewerTest.Droid
     {
         #region Private Members
 
-        private static readonly int MAX_IMAGE_SIZE_WIDTH = 256;
-        private static readonly int MAX_IMAGE_SIZE_HEIGHT = 256;
+        private static readonly int MAX_IMAGE_SIZE_WIDTH = 512;
+        private static readonly int MAX_IMAGE_SIZE_HEIGHT = 512;
 
         private PhotoView _view;
         private PhotoViewDroid _photoView;
