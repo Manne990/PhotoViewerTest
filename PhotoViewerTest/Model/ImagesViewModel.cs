@@ -9,13 +9,6 @@ namespace PhotoViewerTest
         public ImagesViewModel()
         {
             this.Images = new ObservableCollection<ImageViewModel>();
-            /*
-            this.Images = new List<ImageViewModel>() { 
-                new ImageViewModel() { ImageName = "bild1.jpg"},
-                new ImageViewModel() { ImageName = "bild2.jpg"},
-                new ImageViewModel() { ImageName = "bild3.jpg"}
-            };
-            */
         }
 
         private ObservableCollection<ImageViewModel> _images;

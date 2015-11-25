@@ -21,6 +21,7 @@ namespace PhotoViewerTest.Droid
 
         private PhotoView _view;
         private PhotoViewDroid _photoView;
+        private PhotoViewDroidAttacher _photoViewAttacher;
 
         #endregion
 
@@ -55,9 +56,10 @@ namespace PhotoViewerTest.Droid
         {
             base.OnElementPropertyChanged(sender, e);
 
-            if (e.PropertyName == "IsActive")
+            if (e.PropertyName == "IsActive" && _photoViewAttacher != null)
             {
-                //TODO: Reset zoom scale when image gets active (visible)
+                // Reset zoom scale when image gets active (visible)
+                _photoViewAttacher.SetScale(_photoViewAttacher.GetMinimumScale(), 0, 0, false);
             }
 
             if (e.PropertyName == "ImageName" && string.IsNullOrWhiteSpace(_view.ImageName) == false)
@@ -79,6 +81,7 @@ namespace PhotoViewerTest.Droid
         {
             // Create the Photo View
             _photoView = new PhotoViewDroid(this.Context);
+            _photoViewAttacher = new PhotoViewDroidAttacher(_photoView);
 
             // Prepare the image
             var options = await GetBitmapOptionsOfImageAsync(filePath);
@@ -93,6 +96,9 @@ namespace PhotoViewerTest.Droid
 
         private void CleanUpRenderer()
         {
+            _photoViewAttacher.Cleanup();
+            _photoViewAttacher.Dispose();
+
             _photoView.Dispose();
         }
 

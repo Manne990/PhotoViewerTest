@@ -28,13 +28,23 @@ namespace PhotoViewerTest.Droid
 				float x = ev.GetX();
 				float y = ev.GetY();
 
+                if (scale > photoViewAttacher.GetMinimumScale()) 
+                {
+                    photoViewAttacher.SetScale(photoViewAttacher.GetMinimumScale(), x, y, true);
+                }
+                else
+                {
+                    photoViewAttacher.SetScale(photoViewAttacher.GetMediumScale(), x, y, true);
+                }
+
+                /*
 				if (scale < photoViewAttacher.GetMediumScale()) {
 					photoViewAttacher.SetScale(photoViewAttacher.GetMediumScale(), x, y, true);
 				} else if (scale >= photoViewAttacher.GetMediumScale() && scale < photoViewAttacher.GetMaximumScale()) {
 					photoViewAttacher.SetScale(photoViewAttacher.GetMaximumScale(), x, y, true);
 				} else {
 					photoViewAttacher.SetScale(photoViewAttacher.GetMinimumScale(), x, y, true);
-				}
+				}*/
 			} catch (Java.Lang.ArrayIndexOutOfBoundsException e) {
 				// Can sometimes happen when getX() and getY() is called
 			}
