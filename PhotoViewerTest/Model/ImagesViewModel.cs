@@ -6,36 +6,63 @@ namespace PhotoViewerTest
 {
     public class ImagesViewModel : BaseViewModel
     {
+        #region Private Members
+
+        private ObservableCollection<ImageViewModel> _images;
+        private ImageViewModel _currentImage;
+
+        #endregion
+
+        // ------------------------------------------------
+
+        #region Constructors
+
         public ImagesViewModel()
         {
             this.Images = new ObservableCollection<ImageViewModel>();
         }
 
-        private ObservableCollection<ImageViewModel> _images;
-        public ObservableCollection<ImageViewModel> Images 
+        public ImagesViewModel(int numberOfImages)
         {
-            get 
+            this.Images = new ObservableCollection<ImageViewModel>();
+
+            for (int i = 0; i < numberOfImages; i++)
             {
-                return _images;
-            }
-            set 
-            {
-                SetObservableProperty(ref _images, value);
-                CurrentImage = Images.FirstOrDefault ();
+                this.Images.Add(new ImageViewModel());
             }
         }
 
-        private ImageViewModel _currentImage;
-        public ImageViewModel CurrentImage 
+        #endregion
+
+        // ------------------------------------------------
+
+        #region Public Properties
+
+        public ObservableCollection<ImageViewModel> Images
         {
-            get 
+            get
+            {
+                return _images;
+            }
+            set
+            {
+                SetObservableProperty(ref _images, value);
+                CurrentImage = Images.FirstOrDefault();
+            }
+        }
+
+        public ImageViewModel CurrentImage
+        {
+            get
             {
                 return _currentImage;
             }
-            set 
+            set
             {
                 SetObservableProperty(ref _currentImage, value);
             }
         }
+
+        #endregion
     }
 }

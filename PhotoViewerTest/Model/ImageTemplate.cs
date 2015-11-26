@@ -5,25 +5,49 @@ namespace PhotoViewerTest
 {
     public class ImageTemplate : ContentView, ICarouselLayoutChildDelegate
     {
+        #region Private Members
+
         private PhotoView _photoView;
+
+        #endregion
+
+        // ------------------------------------------------
+
+        #region Constructors
 
         public ImageTemplate()
         {
             _photoView = new PhotoView() { BackgroundColor = Color.Gray };
 
-            //_photoView.SetBinding(PhotoView.ImageNameProperty, "ImageName");
-
             Content = _photoView;
         }
+
+        #endregion
+
+        // ------------------------------------------------
+
+        #region Overrides
 
         protected override void OnBindingContextChanged()
         {
             base.OnBindingContextChanged();
 
-            _photoView.ImageName = ((ImageViewModel)this.BindingContext).ImageName;
+            if (string.IsNullOrWhiteSpace(((ImageViewModel)this.BindingContext).ImageName) == false)
+            {
+                _photoView.ImageName = ((ImageViewModel)this.BindingContext).ImageName;
+            }
         }
 
+        #endregion
+
+        // ------------------------------------------------
+
         #region ICarouselLayoutChildDelegate implementation
+
+        public void WillBeActive()
+        {
+            
+        }
 
         public void GotActive()
         {

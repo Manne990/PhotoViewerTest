@@ -52,10 +52,7 @@ namespace PhotoViewerTest.iOS
 
                 InitializeRenderer(_view);
 
-                if (string.IsNullOrWhiteSpace(e.NewElement.ImageName) == false)
-                {
-                    LoadImage();
-                }
+                LoadImage();
             }
         }
 
@@ -69,7 +66,7 @@ namespace PhotoViewerTest.iOS
                 _scrollView.SetZoomScale(_scrollView.MinimumZoomScale, false);
             }
 
-            if (e.PropertyName == "ImageName" && string.IsNullOrWhiteSpace(_view.ImageName) == false)
+            if (e.PropertyName == "ImageName")
             {
                 LoadImage();
 
@@ -81,7 +78,7 @@ namespace PhotoViewerTest.iOS
         {
             base.LayoutSubviews();
 
-            if (_scrollView == null || _imageView == null || string.IsNullOrWhiteSpace(_view.ImageName))
+            if (_scrollView == null || _imageView == null)
             {
                 return;
             }
@@ -170,6 +167,12 @@ namespace PhotoViewerTest.iOS
 
         private void LoadImage()
         {
+            if (string.IsNullOrWhiteSpace(_view.ImageName))
+            {
+                _imageView.Image = UIImage.FromFile("placeholder.png");
+                return;
+            }
+
             var fileSystem = new FileSystem();
             var imageBytes = fileSystem.LoadBinary(_view.ImageName);
 

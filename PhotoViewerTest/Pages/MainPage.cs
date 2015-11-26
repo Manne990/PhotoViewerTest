@@ -14,8 +14,9 @@ namespace PhotoViewerTest
     {
         #region Private Members
 
-        private static bool _useCarousel = true;
-        private PhotoView _photoView;
+        //private PhotoView _photoView;
+        private CarouselLayout _carouselLayout;
+        private ImagesViewModel _viewModel;
 
         #endregion
 
@@ -38,20 +39,12 @@ namespace PhotoViewerTest
         {
             base.OnAppearing();
 
-            if (_useCarousel)
-            {
-                BindingContext = new ImagesViewModel();
+            _viewModel = new ImagesViewModel(7);
+            this.BindingContext = _viewModel;
 
-                await LoadMultipleImages();
+            //await LoadMultipleImages();
 
-                Content = CreatePhotoViewerCarousel();
-            }
-            else
-            {
-                Content = CreateSinglePhotoViewer();
-
-                await LoadSingleImage("bild1.jpg", "https://raw.githubusercontent.com/Manne990/PhotoViewerTest/master/iOS/Resources/bild1.jpg");
-            }
+            Content = CreatePhotoViewerCarousel();
         }
 
         #endregion
@@ -88,37 +81,7 @@ namespace PhotoViewerTest
 
         private void ShowImage(string imageName)
         {
-            if (_useCarousel)
-            {
-                ((ImagesViewModel)this.BindingContext).Images.Add(new ImageViewModel() { ImageName = imageName });
-            }
-            else
-            {
-                _photoView.ImageName = imageName;
-            }
-        }
-
-        private View CreateSinglePhotoViewer()
-        {
-            // Create a signle PhotoView
-            _photoView = new PhotoView() { BackgroundColor = Color.Gray };
-
-            // Add the PhotoView to a layout
-            var layout = new RelativeLayout();
-
-            layout.Children.Add(_photoView, 
-                xConstraint: Constraint.Constant(0),
-                yConstraint: Constraint.Constant(0),
-                widthConstraint: Constraint.RelativeToParent((parent) =>
-                    {
-                        return parent.Width;
-                    }),
-                heightConstraint: Constraint.RelativeToParent((parent) =>
-                    {
-                        return parent.Height;
-                    }));
-
-            return layout;
+            _viewModel.Images.Add(new ImageViewModel() { ImageName = imageName });
         }
 
         private View CreatePhotoViewerCarousel()
@@ -141,18 +104,17 @@ namespace PhotoViewerTest
 
         private CarouselLayout CreatePagesCarousel()
         {
-            var carousel = new CarouselLayout
-            {
+            _carouselLayout = new CarouselLayout {
                 HorizontalOptions = LayoutOptions.FillAndExpand,
                 VerticalOptions = LayoutOptions.FillAndExpand,
                 IndicatorStyle = CarouselLayout.IndicatorStyleEnum.None,
                 ItemTemplate = new DataTemplate(typeof(ImageTemplate))
             };
 
-            carousel.SetBinding(CarouselLayout.ItemsSourceProperty, "Images");
-            carousel.SetBinding(CarouselLayout.SelectedItemProperty, "CurrentImage", BindingMode.TwoWay);
+            _carouselLayout.SetBinding(CarouselLayout.ItemsSourceProperty, "Images");
+            _carouselLayout.SetBinding(CarouselLayout.SelectedItemProperty, "CurrentImage", BindingMode.TwoWay);
 
-            return carousel;
+            return _carouselLayout;
         }
 
         private async Task DownloadAndSaveFile(string url, string filename)

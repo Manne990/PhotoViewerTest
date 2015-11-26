@@ -111,6 +111,7 @@
     <BundleResource Include="Resources\bild5.jpg" />
     <BundleResource Include="Resources\bild6.jpg" />
     <BundleResource Include="Resources\bild7.jpg" />
+    <BundleResource Include="Resources\placeholder.png" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Resources\LaunchScreen.storyboard" />

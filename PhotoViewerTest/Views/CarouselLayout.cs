@@ -9,6 +9,7 @@ namespace PhotoViewerTest
 {
     public interface ICarouselLayoutChildDelegate
     {
+        void WillBeActive();
         void GotActive();
         void GotInactive();
     }
@@ -86,7 +87,12 @@ namespace PhotoViewerTest
 
         void UpdateSelectedItem()
         {
-            Device.StartTimer(TimeSpan.FromMilliseconds(300), () => {
+            if (Children[SelectedIndex] is ICarouselLayoutChildDelegate)
+            {
+                ((ICarouselLayoutChildDelegate)Children[SelectedIndex]).WillBeActive();
+            }
+
+            Device.StartTimer(TimeSpan.FromMilliseconds(3000), () => {
                 SelectedItem = SelectedIndex > -1 ? Children[SelectedIndex].BindingContext : null;
 
                 if (Children[SelectedIndex] is ICarouselLayoutChildDelegate) 
