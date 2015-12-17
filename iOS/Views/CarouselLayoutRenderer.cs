@@ -15,6 +15,7 @@ namespace PhotoViewerTest.iOS
 {
     public class CarouselLayoutRenderer : ScrollViewRenderer
     {
+        CarouselLayout _view;
         UIScrollView _native;
         nfloat _lastContentOffsetX;
 
@@ -30,8 +31,10 @@ namespace PhotoViewerTest.iOS
 
             if (e.OldElement != null) return;
 
+            _view = (CarouselLayout)e.NewElement;
             _native = (UIScrollView)NativeView;
             _native.Scrolled += NativeScrolled;
+
             e.NewElement.PropertyChanged += ElementPropertyChanged;
         }
 
@@ -40,6 +43,11 @@ namespace PhotoViewerTest.iOS
             base.Draw (rect);
 
             ScrollToSelection(false);
+        }
+
+        public override void LayoutSubviews()
+        {
+            base.LayoutSubviews();
         }
             
         private void NativeScrolled(object sender, EventArgs e)
@@ -67,13 +75,10 @@ namespace PhotoViewerTest.iOS
 
         private void ScrollToSelection(bool animate)
         {
-            if (Element == null) return;
+            if (Element == null) 
+                return;
 
-            _native.SetContentOffset(new CoreGraphics.CGPoint 
-                (_native.Bounds.Width * 
-                    Math.Max(0, ((CarouselLayout)Element).SelectedIndex), 
-                    _native.ContentOffset.Y), 
-                animate);
+            _native.SetContentOffset(new CoreGraphics.CGPoint (_native.Bounds.Width * Math.Max(0, ((CarouselLayout)Element).SelectedIndex), _native.ContentOffset.Y), animate);
         }
     }
 }

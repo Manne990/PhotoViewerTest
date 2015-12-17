@@ -5,17 +5,6 @@ namespace PhotoViewerTest
 {
     public class PhotoView : ScrollView
     {
-        #region Constructors
-
-        public PhotoView()
-        {
-
-        }
-
-        #endregion
-
-        // ---------------------------------------------------------
-
         #region Public Properties
 
         public static readonly BindableProperty ImageNameProperty = BindableProperty.Create("ImageName", typeof(string), typeof(PhotoView), string.Empty);

@@ -17,5 +17,18 @@ namespace PhotoViewerTest
                 SetObservableProperty(ref _imageName, value);
             }
         }
+
+        private string _imageUrl;
+        public string ImageUrl 
+        {
+            get 
+            {
+                return _imageUrl;
+            }
+            set 
+            {
+                SetObservableProperty(ref _imageUrl, value);
+            }
+        }
     }
 }

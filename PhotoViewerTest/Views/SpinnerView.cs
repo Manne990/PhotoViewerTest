@@ -14,7 +14,6 @@ namespace PhotoViewerTest
         public SpinnerView()
         {
             // Init
-            //this.IsVisible = false;
             this.Opacity = 0;
 
             // Create Controls
@@ -25,7 +24,7 @@ namespace PhotoViewerTest
                 };
 
             _roundedBox = new RoundedBox()
-                { 
+                {
                     BackgroundColor = Color.Black,
                     CornerRadius = 10,
                     Opacity = 1
@@ -90,6 +89,18 @@ namespace PhotoViewerTest
             ctrl.IsBusy = newValue;
         }
         );
+
+        public Color SpinnerBackgroundColor
+        {
+            get
+            { 
+                return _roundedBox.BackgroundColor;
+            }
+            set
+            { 
+                _roundedBox.BackgroundColor = value;
+            }
+        }
 
         public bool IsBusy
         {

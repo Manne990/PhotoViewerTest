@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Xamarin.Forms;
+using System.Threading.Tasks;
 
 namespace PhotoViewerTest
 {
     public interface ICarouselLayoutChildDelegate
     {
-        void WillBeActive();
-        void GotActive();
-        void GotInactive();
+        Task WillBeActive();
+        Task GotActive();
+        Task GotInactive();
     }
 
     public class CarouselLayout : ScrollView
@@ -71,9 +72,9 @@ namespace PhotoViewerTest
                 carousel => carousel.SelectedIndex,
                 0,
                 BindingMode.TwoWay,
-                propertyChanged: (bindable, oldValue, newValue) => {
-                ((CarouselLayout)bindable).UpdateSelectedItem ();
-            }
+                propertyChanged: async (bindable, oldValue, newValue) =>  {
+                    await ((CarouselLayout)bindable).UpdateSelectedItem();
+                }
             );
 
         public int SelectedIndex {
@@ -85,28 +86,30 @@ namespace PhotoViewerTest
             }
         }
 
-        void UpdateSelectedItem()
+        async Task UpdateSelectedItem()
         {
             if (Children[SelectedIndex] is ICarouselLayoutChildDelegate)
             {
-                ((ICarouselLayoutChildDelegate)Children[SelectedIndex]).WillBeActive();
+                await ((ICarouselLayoutChildDelegate)Children[SelectedIndex]).WillBeActive();
             }
 
-            Device.StartTimer(TimeSpan.FromMilliseconds(3000), () => {
-                SelectedItem = SelectedIndex > -1 ? Children[SelectedIndex].BindingContext : null;
+            Device.StartTimer(TimeSpan.FromMilliseconds(500), () => {
+                Task.Factory.StartNew(async () => {
+                    SelectedItem = SelectedIndex > -1 ? Children[SelectedIndex].BindingContext : null;
 
-                if (Children[SelectedIndex] is ICarouselLayoutChildDelegate) 
-                {
-                    ((ICarouselLayoutChildDelegate)Children[SelectedIndex]).GotActive();
-
-                    for (int i = 0; i < Children.Count; i++) 
+                    if (Children[SelectedIndex] is ICarouselLayoutChildDelegate) 
                     {
-                        if (i != SelectedIndex && Children[i] is ICarouselLayoutChildDelegate) 
+                        await ((ICarouselLayoutChildDelegate)Children[SelectedIndex]).GotActive();
+
+                        for (int i = 0; i < Children.Count; i++) 
                         {
-                            ((ICarouselLayoutChildDelegate)Children[i]).GotInactive();
+                            if (i != SelectedIndex && Children[i] is ICarouselLayoutChildDelegate) 
+                            {
+                                await ((ICarouselLayoutChildDelegate)Children[i]).GotInactive();
+                            }
                         }
                     }
-                }
+                });
 
                 return false;
             });
@@ -117,10 +120,10 @@ namespace PhotoViewerTest
                 view => view.ItemsSource,
                 null,
                 propertyChanging: (bindableObject, oldValue, newValue) => {
-                    ((CarouselLayout)bindableObject).ItemsSourceChanging ();
+                    ((CarouselLayout)bindableObject).ItemsSourceChanging();
                 },
-                propertyChanged: (bindableObject, oldValue, newValue) => {
-                    ((CarouselLayout)bindableObject).ItemsSourceChanged ();
+                propertyChanged: async (bindableObject, oldValue, newValue) => {
+                    await ((CarouselLayout)bindableObject).ItemsSourceChanged();
                 }
             );
 
@@ -133,24 +136,29 @@ namespace PhotoViewerTest
             }
         }
 
-        public void Refresh()
+        public async void Refresh()
         {
             ItemsSourceChanging();
-            ItemsSourceChanged();
+            await ItemsSourceChanged();
         }
 
         void ItemsSourceChanging ()
         {
-            if (ItemsSource == null) return;
+            if (ItemsSource == null)
+            {
+                return;
+            }
+
             _selectedIndex = ItemsSource.IndexOf(SelectedItem);
         }
 
-        void ItemsSourceChanged ()
+        async Task ItemsSourceChanged ()
         {
-            _stack.Children.Clear ();
+            _stack.Children.Clear();
+
             foreach (var item in ItemsSource) 
             {
-                var view = (View)ItemTemplate.CreateContent ();
+                var view = (View)ItemTemplate.CreateContent();
                 var bindableObject = view as BindableObject;
 
                 if (bindableObject != null)
@@ -158,10 +166,27 @@ namespace PhotoViewerTest
                     bindableObject.BindingContext = item;
                 }
                     
-                _stack.Children.Add (view);
+                _stack.Children.Add(view);
             }
 
-            if (_selectedIndex >= 0) SelectedIndex = _selectedIndex;
+            if (_selectedIndex >= 0)
+            {
+                SelectedIndex = _selectedIndex;
+
+                if (Children[SelectedIndex] is ICarouselLayoutChildDelegate)
+                {
+                    await ((ICarouselLayoutChildDelegate)Children[SelectedIndex]).WillBeActive();
+                    await ((ICarouselLayoutChildDelegate)Children[SelectedIndex]).GotActive();
+
+                    for (int i = 0; i < Children.Count; i++) 
+                    {
+                        if (i != SelectedIndex && Children[i] is ICarouselLayoutChildDelegate) 
+                        {
+                            await ((ICarouselLayoutChildDelegate)Children[i]).GotInactive();
+                        }
+                    }
+                }
+            }
         }
 
         public DataTemplate ItemTemplate {
@@ -175,8 +200,8 @@ namespace PhotoViewerTest
                 null,
                 BindingMode.TwoWay,
                 propertyChanged: (bindable, oldValue, newValue) => {
-                ((CarouselLayout)bindable).UpdateSelectedIndex ();
-            }
+                    ((CarouselLayout)bindable).UpdateSelectedIndex ();
+                }
             );
 
         public object SelectedItem {

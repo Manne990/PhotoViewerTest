@@ -176,12 +176,23 @@ namespace PhotoViewerTest.iOS
             var fileSystem = new FileSystem();
             var imageBytes = fileSystem.LoadBinary(_view.ImageName);
 
+            if (imageBytes == null)
+            {
+                _imageView.Image = UIImage.FromFile("placeholder.png");
+                return;
+            }
+
             _imageView.Image = imageBytes.ToUIImage();
         }
 
         private void UpdateMinimumMaximumZoom()
         {
             nfloat zoomScale = GetZoomScaleThatFits(this.Bounds.Size, _imageView.Bounds.Size);
+
+            if (nfloat.IsNaN(zoomScale) || nfloat.IsPositiveInfinity(zoomScale) || nfloat.IsNegativeInfinity(zoomScale))
+            {
+                zoomScale = 1.0f;
+            }
 
             _scrollView.MinimumZoomScale = zoomScale * 0.99f;   
             _scrollView.MaximumZoomScale = _scrollView.MinimumZoomScale * 6;
