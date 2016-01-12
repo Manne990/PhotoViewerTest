@@ -10,6 +10,7 @@ namespace PhotoViewerTest
         {
             // The root page of your application
             MainPage = new PhotoViewerTest.MainPage();
+            //MainPage = new PhotoViewerTest.SingleImagePage();
         }
 
         protected override void OnStart()

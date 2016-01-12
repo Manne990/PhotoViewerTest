@@ -13,6 +13,7 @@ namespace PhotoViewerTest
         Task WillBeActive();
         Task GotActive();
         Task GotInactive();
+        Task Refresh();
     }
 
     public class CarouselLayout : ScrollView
@@ -165,7 +166,7 @@ namespace PhotoViewerTest
                 {
                     bindableObject.BindingContext = item;
                 }
-                    
+
                 _stack.Children.Add(view);
             }
 
@@ -180,9 +181,14 @@ namespace PhotoViewerTest
 
                     for (int i = 0; i < Children.Count; i++) 
                     {
-                        if (i != SelectedIndex && Children[i] is ICarouselLayoutChildDelegate) 
+                        if (Children[i] is ICarouselLayoutChildDelegate)
                         {
-                            await ((ICarouselLayoutChildDelegate)Children[i]).GotInactive();
+                            await ((ICarouselLayoutChildDelegate)Children[i]).Refresh();
+
+                            if (i != SelectedIndex) 
+                            {
+                                await ((ICarouselLayoutChildDelegate)Children[i]).GotInactive();
+                            }
                         }
                     }
                 }

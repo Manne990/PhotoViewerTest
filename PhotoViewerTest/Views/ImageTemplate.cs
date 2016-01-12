@@ -20,8 +20,6 @@ namespace PhotoViewerTest
         public ImageTemplate()
         {
             _photoView = new PhotoView() { BackgroundColor = Color.Gray };
-
-            Content = _photoView;
         }
 
         #endregion
@@ -49,10 +47,24 @@ namespace PhotoViewerTest
 
         #region ICarouselLayoutChildDelegate implementation
 
-        public async Task WillBeActive()
+        public async Task Refresh()
         {
             var fileSystem = DependencyService.Get<IFileSystem>();
             var imageName = ((ImageViewModel)this.BindingContext).ImageName;
+
+            if (fileSystem.FileExists(imageName))
+            {
+                Device.BeginInvokeOnMainThread(() => {
+                    Content = _photoView;
+                });
+            }
+        }
+
+        public async Task WillBeActive()
+        {
+            var fileSystem = DependencyService.Get<IFileSystem>();
+            var content = ((ImageViewModel)this.BindingContext);
+            var imageName = content.ImageName;
 
             if (fileSystem.FileExists(imageName) == false)
             {
@@ -85,7 +97,7 @@ namespace PhotoViewerTest
             Device.BeginInvokeOnMainThread(() => {
                 _photoView.IsActive = false;
             });
-            
+
             //TODO: Find a way to unload invisible images to save memory
         }
 

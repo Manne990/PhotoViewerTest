@@ -31,8 +31,6 @@ namespace PhotoViewerTest
 
         public void LoadPhotos(List<ImageViewModel> images, int selectedIndex)
         {
-            images.Add(new ImageViewModel() { ImageName = "placeholder.png" }); //REMARK: Sometimes the last image does not show...
-
             _carouselLayout.ItemsSource = images;
             _carouselLayout.SelectedIndex = selectedIndex;
         }
