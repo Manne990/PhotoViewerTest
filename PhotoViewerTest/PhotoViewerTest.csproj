@@ -39,12 +39,10 @@
     <Compile Include="Services\IFileSystem.cs" />
     <Compile Include="Model\BaseViewModel.cs" />
     <Compile Include="Model\ImageViewModel.cs" />
-    <Compile Include="Model\ImagesViewModel.cs" />
     <Compile Include="Views\SpinnerView.cs" />
     <Compile Include="Views\RoundedBox.cs" />
     <Compile Include="Pages\SingleImagePage.cs" />
     <Compile Include="Views\PhotoCarousel.cs" />
-    <Compile Include="Common\EventArgs.cs" />
     <Compile Include="Views\ImageTemplate.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
