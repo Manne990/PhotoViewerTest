@@ -9,6 +9,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoViewerTest.Droid", "Dr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoViewerTest.UITests", "UITests\PhotoViewerTest.UITests.csproj", "{780B74EB-0A5E-4901-A09B-BEAFE5A6A631}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Screenshots", "Screenshots", "{5CDEE79B-80E4-4855-A8E0-E05F2281593D}"
+	ProjectSection(SolutionItems) = preProject
+		AndroidScreen.png = AndroidScreen.png
+		iOSScreen.png = iOSScreen.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,5 +73,7 @@ Global
 		{F7A6BC16-E4FD-464C-950C-FDB06DBD56E4}.Release|iPhone.Build.0 = Release|Any CPU
 		{F7A6BC16-E4FD-464C-950C-FDB06DBD56E4}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{F7A6BC16-E4FD-464C-950C-FDB06DBD56E4}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal
