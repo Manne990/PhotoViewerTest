@@ -1,4 +1,4 @@
-# PhotoViewerTest
+# Xamarin Forms - PhotoViewer
 Custom Xamarin Forms photo slide show viewer
 
 Features browse photos with swipe, zooming, double tap to zoom, download remote photos to local cache
