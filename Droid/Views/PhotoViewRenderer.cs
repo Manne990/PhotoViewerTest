@@ -81,7 +81,7 @@ namespace PhotoViewerTest.Droid
         {
             // Create the Photo View
             _photoView = new PhotoViewDroid(this.Context);
-            _photoViewAttacher = new PhotoViewDroidAttacher(_photoView);
+            _photoViewAttacher = _photoView.GetPhotoViewDroidAttacher();
 
             // Prepare the image
             var options = await GetBitmapOptionsOfImageAsync(filePath);
