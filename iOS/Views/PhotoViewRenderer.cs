@@ -18,7 +18,7 @@ namespace PhotoViewerTest.iOS
         private UIScrollView _scrollView;
         private UIImageView _imageView;
         private PhotoView _view;
-		private bool _doubleTapHandled = false;
+        private bool _doubleTapHandled = false;
 
         #endregion
 
@@ -104,7 +104,7 @@ namespace PhotoViewerTest.iOS
 
         private void OnDoubleTap(UIGestureRecognizer gesture)
         {
-          //double tap handled. So do not 
+          //double tap handled. So do not process single tap 
           _doubleTapHandled = true;
 
           var location = gesture.LocationInView(_scrollView);
