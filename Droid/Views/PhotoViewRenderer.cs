@@ -12,8 +12,10 @@ using Xamarin.Forms.Platform.Android;
 [assembly:ExportRenderer(typeof(PhotoView), typeof(PhotoViewRenderer))]
 namespace PhotoViewerTest.Droid
 {
-    public class PhotoViewRenderer : ViewRenderer<PhotoView, PhotoViewDroid>
-    {
+    public class PhotoViewRenderer 
+    : ViewRenderer<PhotoView, PhotoViewDroid>
+    , PhotoViewDroidAttacher.IOnViewTapListener
+  {
         #region Private Members
 
         private static readonly int MAX_IMAGE_SIZE_WIDTH = 512;
@@ -81,7 +83,9 @@ namespace PhotoViewerTest.Droid
         {
             // Create the Photo View
             _photoView = new PhotoViewDroid(this.Context);
-            _photoViewAttacher = new PhotoViewDroidAttacher(_photoView);
+            _photoViewAttacher = _photoView.GetPhotoViewDroidAttacher();
+
+            _photoViewAttacher.SetOnViewTapListener(this);
 
             // Prepare the image
             var options = await GetBitmapOptionsOfImageAsync(filePath);
@@ -150,6 +154,17 @@ namespace PhotoViewerTest.Droid
             return await BitmapFactory.DecodeFileAsync(filePath, options);
         }
 
-        #endregion
+    #endregion
+
+    #region Private Event Forwarding
+    public void OnViewTap(Android.Views.View view, float x, float y)
+    {
+      OnItemTapped();
     }
+    protected void OnItemTapped()
+    {
+      ((PhotoView)Element).OnTap();
+    }
+    #endregion
+  }
 }

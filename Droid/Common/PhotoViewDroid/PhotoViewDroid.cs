@@ -41,8 +41,14 @@ namespace PhotoViewerTest.Droid
 				mPendingScaleType = null;
 			}
 		}
-		#region IPhotoView imp
-		public bool CanZoom ()
+
+    public PhotoViewDroidAttacher GetPhotoViewDroidAttacher()
+    {
+      return mAttacher;
+    }
+
+    #region IPhotoView imp
+    public bool CanZoom ()
 		{
 			return mAttacher.CanZoom();
 		}

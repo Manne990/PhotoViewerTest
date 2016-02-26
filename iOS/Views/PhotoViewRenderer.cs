@@ -18,6 +18,7 @@ namespace PhotoViewerTest.iOS
         private UIScrollView _scrollView;
         private UIImageView _imageView;
         private PhotoView _view;
+        private bool _doubleTapHandled = false;
 
         #endregion
 
@@ -103,7 +104,10 @@ namespace PhotoViewerTest.iOS
 
         private void OnDoubleTap(UIGestureRecognizer gesture)
         {
-            var location = gesture.LocationInView(_scrollView);
+          //double tap handled. So do not process single tap 
+          _doubleTapHandled = true;
+
+          var location = gesture.LocationInView(_scrollView);
 
             if (_scrollView.ZoomScale > _scrollView.MinimumZoomScale)
             {
@@ -115,13 +119,33 @@ namespace PhotoViewerTest.iOS
             }
         }
 
-        #endregion
+    private bool OnTap()
+    {
+      if (_doubleTapHandled == false)
+      {
+        OnItemTapped();
+      }
+      return false;
+    }
 
-        // ---------------------------------------------------------
+    private void OnTapDelayed(UIGestureRecognizer gesture)
+    {
+      _doubleTapHandled = false;
+      Xamarin.Forms.Device.StartTimer(new TimeSpan(0, 0, 0, 0, 300), OnTap);
+    }
 
-        #region Public Properties
+    protected void OnItemTapped()
+    {
+      if(_view != null)
+        _view.OnTap();
+    }
+    #endregion
 
-        public AutoScaleModes AutoScaleMode { get; set; }
+    // ---------------------------------------------------------
+
+    #region Public Properties
+
+    public AutoScaleModes AutoScaleMode { get; set; }
 
         #endregion
 
@@ -156,8 +180,9 @@ namespace PhotoViewerTest.iOS
             this.SetNativeControl(_scrollView);
 
             // Add gesture recognizers
+			this.Control.AddGestureRecognizer(new UITapGestureRecognizer(OnTapDelayed) { NumberOfTapsRequired = 1 });
             this.Control.AddGestureRecognizer(new UITapGestureRecognizer(OnDoubleTap) { NumberOfTapsRequired = 2 });
-        }
+    }
 
         private void CleanUpRenderer()
         {

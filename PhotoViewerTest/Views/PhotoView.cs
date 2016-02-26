@@ -21,6 +21,21 @@ namespace PhotoViewerTest
             set { SetValue(IsActiveProperty, value); }
         }
 
-        #endregion
+    #endregion
+    #region Public Events
+    public event EventHandler<EventArgs> Tap;
+
+    protected virtual void OnHandleTap(EventArgs e)
+    {
+      var handler = Tap;
+      if (handler != null)
+        handler(this, e);
     }
+
+    public void OnTap()
+    {
+      OnHandleTap(new EventArgs());
+    }
+    #endregion
+  }
 }

@@ -67,6 +67,8 @@ namespace PhotoViewerTest
             // Create a signle PhotoView
             _photoView = new PhotoView() { BackgroundColor = Color.Gray };
 
+            _photoView.Tap += OnPhotoTab;
+
             // Add the PhotoView to a layout
             var layout = new RelativeLayout();
 
@@ -84,5 +86,11 @@ namespace PhotoViewerTest
 
             return layout;
         }
-    }
+
+        public async void OnPhotoTab(object sender, EventArgs args)
+        {
+          await DisplayAlert ( "Photo Tapped", "You Tapped the photo", "OK");
+        }
+
+  }
 }

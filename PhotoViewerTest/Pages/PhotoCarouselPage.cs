@@ -10,7 +10,7 @@ using Xamarin.Forms;
 
 namespace PhotoViewerTest
 {
-    public class MainPage : ContentPage
+    public class PhotoCarouselPage : ContentPage
     {
         #region Private Members
 
@@ -22,7 +22,7 @@ namespace PhotoViewerTest
 
         #region Constructors
 
-        public MainPage()
+        public PhotoCarouselPage()
         {
             // Create the photo carousel
             var layout = new RelativeLayout();

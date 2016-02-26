@@ -24,6 +24,11 @@ namespace PhotoViewerTest.iOS
 
         public byte[] LoadBinary(string fileName)
         {
+            // if file path already is a absolute path
+            if (File.Exists(fileName))
+            {
+              return LoadBinaryResource(fileName);
+            }
             var docUrl = applicationDocumentsDirectory().Append(fileName, false);
             var filePath = docUrl.AbsoluteString.Replace("file://", "");
             return LoadBinaryResource(filePath);
