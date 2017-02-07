@@ -41,6 +41,10 @@ namespace PhotoViewerTest.Droid
                     .GetField ("hScrollView", BindingFlags.NonPublic | BindingFlags.Instance)
                     .GetValue (this);
 
+                // REMARK: The previous line of code stopped working in Xamarin Forms 2.2
+                //           Use the below line instead.
+                //_scrollView = (HorizontalScrollView)this.ViewGroup.GetChildAt(0);
+
                 _scrollView.HorizontalScrollBarEnabled = false;
                 _scrollView.Touch += HScrollViewTouch;
             }
